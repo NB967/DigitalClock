@@ -84,3 +84,5 @@ while True:
 # For more complex Streamlit apps that need real-time updates and also handle user interactions
 # efficiently, consider more advanced patterns involving session state and callbacks, or
 # Streamlit's own components for long-running tasks if applicable.
+
+streamlit run clock_app.py
