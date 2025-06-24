@@ -1,10 +1,11 @@
 import streamlit as st
 import datetime
 import time
+import subprocess # Import subprocess to run shell commands
 
 # --- Streamlit App Configuration ---
 st.set_page_config(
-    page_title="Digital Clock",
+    page_title="Digital Clock with Git Info",
     page_icon="⏰",
     layout="centered"
 )
@@ -12,6 +13,44 @@ st.set_page_config(
 st.title("Live Digital Clock")
 st.write("This simple application displays the current time, updating every second.")
 
+# --- Git Information Section ---
+st.header("Application Version (Git Info)")
+
+def get_git_last_commit_info():
+    """
+    Runs a git command to get the last commit hash and message.
+    Returns a formatted string or an error message.
+    """
+    try:
+        # Command to get the last commit hash and subject (message)
+        # %h: Abbreviated commit hash
+        # %s: Commit subject
+        command = ["git", "log", "-1", "--pretty=format:%h - %s"]
+        
+        # Run the command
+        # capture_output=True: captures stdout and stderr
+        # text=True: decodes output as text
+        # check=True: raises CalledProcessError if the command returns a non-zero exit code
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except FileNotFoundError:
+        return "Error: Git is not installed or not found in system PATH."
+    except subprocess.CalledProcessError as e:
+        # This occurs if it's not a Git repository or other git errors
+        return f"Error: Not a Git repository or Git command failed. ({e.stderr.strip()})"
+    except Exception as e:
+        return f"An unexpected error occurred while getting Git info: {e}"
+
+# Get Git info once when the app starts
+git_info = get_git_last_commit_info()
+st.info(f"Last Commit: {git_info}")
+
+# --- Clock Display ---
 # Create an empty placeholder for the clock display
 # This allows us to update the content in place without re-rendering the whole app
 clock_placeholder = st.empty()
